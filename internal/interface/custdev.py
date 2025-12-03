@@ -2,7 +2,7 @@ from typing import Protocol
 from abc import abstractmethod
 
 from internal import model
-from internal.controller.http.webhook.handler import CreateQuestionsRequest, CreateQuestionsBatchRequest
+from internal.controller.http.handler.custdev.handler import CreateQuestionsRequest, CreateQuestionsBatchRequest
 
 
 class ICustDevController(Protocol):
