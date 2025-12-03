@@ -41,8 +41,9 @@ class CommandController(interface.ICommandController):
         if command.args:
             start_data["questions_id"] = command.args
 
-        chat = (await self.llm_chat_repo.get_chat_by_state_id(user_state.id))[0]
-        await self.llm_chat_repo.delete_chat(chat.id)
+        chat = await self.llm_chat_repo.get_chat_by_state_id(user_state.id)
+        if chat:
+            await self.llm_chat_repo.delete_chat(chat[0].id)
 
         await dialog_manager.start(
             model.CustdevStates.hello,
