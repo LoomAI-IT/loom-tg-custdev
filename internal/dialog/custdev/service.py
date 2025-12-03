@@ -89,7 +89,7 @@ class DCustDevService(interface.IDCustDevService):
                         questions_id=questions_id,
                         result=custdev_result
                     )
-
+                dialog_manager.dialog_data["message_to_user"] = "Спасибо за ваш отзыв!"
                 return
 
             message_to_user = llm_response_json["message_to_user"]

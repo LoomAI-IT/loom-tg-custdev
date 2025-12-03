@@ -49,4 +49,5 @@ class CustDevDialog(interface.ICustDevDialog):
 
             state=model.CustdevStates.custdev,
             getter=self.custdev_getter.get_custdev_data,
+            parse_mode=SULGUK_PARSE_MODE,
         )
