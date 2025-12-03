@@ -83,14 +83,12 @@ class CustDevController(interface.ICustDevController):
         try:
             # Пробуем сначала парсить как JSON
             data = json.loads(result)
-            return data.get("custdev_result", [])
+            return data
         except json.JSONDecodeError:
             # Если не получилось, пробуем парсить как Python dict (старый формат)
             try:
                 data = ast.literal_eval(result)
-                if isinstance(data, dict):
-                    return data.get("custdev_result", [])
-                elif isinstance(data, list):
+                if isinstance(data, list):
                     return data
                 else:
                     raise ValueError(f"Unexpected data type: {type(data)}")
