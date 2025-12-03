@@ -2,7 +2,6 @@ from aiogram import Bot
 from aiogram_dialog import DialogManager
 
 from internal import interface, model
-from main import add_employee_dialog
 from pkg.log_wrapper import auto_log
 from pkg.tg_action_wrapper import tg_action
 from pkg.trace_wrapper import traced_method
