@@ -79,7 +79,7 @@ storage = RedisStorage(
     key_builder=key_builder
 )
 dp = Dispatcher(storage=storage)
-bot = Bot(token=cfg.tg_bot_token)
+bot = Bot(token=cfg.tg_custdev_bot_token)
 bot.session.middleware(AiogramSulgukMiddleware())
 
 # Инициализация клиентов
