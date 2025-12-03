@@ -5,7 +5,7 @@ from aiogram.types import Update
 from aiogram_dialog import BgManagerFactory
 from fastapi import Header
 
-from internal import interface, model
+from internal import interface
 from pkg.log_wrapper import auto_log
 from pkg.trace_wrapper import traced_method
 
@@ -79,3 +79,6 @@ class TelegramWebhookController(interface.ITelegramWebhookController):
                 "Нажмите /start чтобы начать!"
             )
         )
+
+
+

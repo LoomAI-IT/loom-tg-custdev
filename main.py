@@ -18,6 +18,7 @@ from internal.controller.tg.middleware.middleware import TgMiddleware
 
 from internal.controller.tg.command.handler import CommandController
 from internal.controller.http.webhook.handler import TelegramWebhookController
+from internal.controller.http.handler.custdev.handler import CustDevController
 
 from internal.dialog.custdev.dialog import CustDevDialog
 
@@ -170,10 +171,16 @@ tg_webhook_controller = TelegramWebhookController(
     cfg.interserver_secret_key
 )
 
+custdev_controller = CustDevController(
+    tel,
+    custdev_service
+)
+
 app = NewServer(
     db,
     http_middleware,
     tg_webhook_controller,
+    custdev_controller,
     cfg.prefix,
     cfg.environment
 )

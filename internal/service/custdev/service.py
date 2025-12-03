@@ -14,10 +14,6 @@ class CustDevService(interface.ICustDevService):
         return custdev_id
 
     @traced_method()
-    async def get_custdev_by_state_id(self, state_id: int) -> list[model.CustDev]:
-        return await self.custdev_repo.get_custdev_by_state_id(state_id)
-
-    @traced_method()
     async def create_questions(self, questions: list[str]) -> int:
         questions_id = await self.custdev_repo.create_questions(questions)
         return questions_id

@@ -7,6 +7,7 @@ def NewServer(
         db: interface.IDB,
         http_middleware: interface.IHttpMiddleware,
         tg_webhook_controller: interface.ITelegramWebhookController,
+        custdev_controller: interface.ICustDevController,
         prefix: str,
         environment: str
 ):
@@ -19,6 +20,7 @@ def NewServer(
 
     include_db_handler(app, db, prefix, environment)
     include_tg_webhook(app, tg_webhook_controller, prefix)
+    include_custdev_routes(app, custdev_controller, prefix)
 
     return app
 
@@ -82,3 +84,42 @@ def drop_table_handler(db: interface.IDB, environment: str):
             raise err
 
     return delete_table
+
+
+def include_custdev_routes(
+        app: FastAPI,
+        custdev_controller: interface.ICustDevController,
+        prefix: str
+):
+    app.add_api_route(
+        prefix + "/custdev/questions/create",
+        custdev_controller.create_questions,
+        methods=["POST"]
+    )
+    app.add_api_route(
+        prefix + "/custdev/questions/batch",
+        custdev_controller.create_questions_batch,
+        methods=["POST"]
+    )
+    app.add_api_route(
+        prefix + "/custdev/questions/{questions_id}",
+        custdev_controller.get_questions_by_id,
+        methods=["GET"]
+    )
+    app.add_api_route(
+        prefix + "/custdev/questions",
+        custdev_controller.get_all_questions,
+        methods=["GET"]
+    )
+
+    app.add_api_route(
+        prefix + "/custdev/all",
+        custdev_controller.get_all_custdev,
+        methods=["GET"]
+    )
+
+    app.add_api_route(
+        prefix + "/custdev/questions/{questions_id}",
+        custdev_controller.delete_questions,
+        methods=["DELETE"]
+    )
