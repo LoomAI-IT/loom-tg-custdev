@@ -5,15 +5,8 @@ VALUES (:state_id, :questions_id, :result)
 RETURNING id;
 """
 
-get_custdev_by_state_id_query = """
+get_all_custdev_query = """
 SELECT * FROM custdev
-WHERE state_id = :state_id
-ORDER BY created_at DESC;
-"""
-
-get_custdev_by_id_query = """
-SELECT * FROM custdev
-WHERE id = :custdev_id;
 """
 
 # Queries for custdev_questions table

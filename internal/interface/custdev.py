@@ -68,14 +68,6 @@ class ICustDevRepo(Protocol):
     async def create_custdev(self, state_id: int, questions_id: int, result: str) -> int:
         pass
 
-    @abstractmethod
-    async def get_custdev_by_state_id(self, state_id: int) -> list[model.CustDev]:
-        pass
-
-    @abstractmethod
-    async def get_custdev_by_id(self, custdev_id: int) -> list[model.CustDev]:
-        pass
-
     # CustDevQuestions operations
     @abstractmethod
     async def create_questions(self, questions: list[str]) -> int:

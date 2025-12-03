@@ -25,11 +25,13 @@ class CustDevService(interface.ICustDevService):
         return ids
 
     @traced_method()
-    async def get_questions_by_id(self, questions_id: int) -> model.CustDevQuestions | None:
+    async def get_all_custdev(self) -> list[model.CustDev]:
+        return await self.custdev_repo.get_all_custdev()
+
+    @traced_method()
+    async def get_questions_by_id(self, questions_id: int) -> list[model.CustDevQuestions]:
         questions = await self.custdev_repo.get_questions_by_id(questions_id)
-        if questions:
-            return questions[0]
-        return None
+        return questions
 
     @traced_method()
     async def get_all_questions(self) -> list[model.CustDevQuestions]:
