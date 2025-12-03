@@ -40,7 +40,7 @@ def include_command_handlers(
 ):
     dp.message.register(
         command_controller.start_handler,
-        CommandStart()
+        CommandStart(deep_link=True)
     )
 
 

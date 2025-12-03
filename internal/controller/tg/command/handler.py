@@ -31,7 +31,6 @@ class CommandController(interface.ICommandController):
         if not user_state:
             tg_username = message.from_user.username if message.from_user.username else "отсутвует username"
             await self.state_service.create_state(tg_chat_id, tg_username)
-
         start_data = {}
         if command.args:
             start_data["questions_id"] = command.args
