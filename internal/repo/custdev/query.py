@@ -23,7 +23,6 @@ WHERE id = :questions_id;
 
 get_all_questions_query = """
 SELECT * FROM custdev_questions
-ORDER BY created_at DESC;
 """
 
 delete_questions_query = """
