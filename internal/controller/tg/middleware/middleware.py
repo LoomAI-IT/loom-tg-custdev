@@ -61,7 +61,6 @@ class TgMiddleware(interface.ITelegramMiddleware):
             self.logger.warning("Ошибка!!!", {"traceback": traceback.format_exc()})
             if not await self._recovery_start_functionality(tg_chat_id, tg_username):
                 self.logger.error("Ошибка!!!", {"traceback": traceback.format_exc()})
-                raise e
 
         finally:
             self.log_context.reset(context_token)
