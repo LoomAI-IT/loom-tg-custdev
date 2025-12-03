@@ -11,7 +11,7 @@ class Config:
         self.root_path = os.getenv("ROOT_PATH", "/")
         self.prefix = os.getenv("LOOM_TG_CUSTDEV_PREFIX", "/api/tg-bot")
         self.log_level = os.getenv("LOG_LEVEL", "INFO")
-        self.tg_bot_token: str = os.environ.get('LOOM_TG_CUSTDEV_TOKEN')
+        self.tg_custdev_bot_token: str = os.environ.get('LOOM_TG_CUSTDEV_TOKEN')
         self.domain: str = os.environ.get("LOOM_DOMAIN")
         self.proxy: str = os.environ.get("PROXY")
 
