@@ -14,6 +14,10 @@ class ICustDevDialog(Protocol):
         pass
 
     @abstractmethod
+    def get_intro_window(self) -> Window:
+        pass
+
+    @abstractmethod
     def get_custdev_window(self) -> Window:
         pass
 

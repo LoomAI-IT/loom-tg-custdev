@@ -37,6 +37,6 @@ class CommandController(interface.ICommandController):
             await self.state_service.create_state(tg_chat_id, tg_username)
 
         await dialog_manager.start(
-            model.CustdevStates.custdev,
+            model.CustdevStates.hello,
             mode=StartMode.RESET_STACK
         )
