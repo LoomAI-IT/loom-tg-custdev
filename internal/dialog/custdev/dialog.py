@@ -23,6 +23,7 @@ class CustDevDialog(interface.ICustDevDialog):
         return Dialog(
             self.get_intro_window(),
             self.get_custdev_window(),
+            self.get_completion_window(),
         )
 
     def get_intro_window(self) -> Window:
@@ -49,5 +50,16 @@ class CustDevDialog(interface.ICustDevDialog):
 
             state=model.CustdevStates.custdev,
             getter=self.custdev_getter.get_custdev_data,
+            parse_mode=SULGUK_PARSE_MODE,
+        )
+
+    def get_completion_window(self) -> Window:
+        return Window(
+            Multi(
+                Format("{completion_message}"),
+                Const(""),
+            ),
+            state=model.CustdevStates.completion,
+            getter=self.custdev_getter.get_completion_data,
             parse_mode=SULGUK_PARSE_MODE,
         )

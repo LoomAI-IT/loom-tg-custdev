@@ -93,6 +93,20 @@ class CustDevGetter(interface.ICustDevGetter):
 
         return data
 
+    @auto_log()
+    @traced_method()
+    async def get_completion_data(
+            self,
+            dialog_manager: DialogManager,
+            **kwargs
+    ) -> dict:
+        completion_message = dialog_manager.dialog_data.get(
+            "completion_message",
+            "Спасибо за ваш отзыв!"
+        )
+
+        return {"completion_message": completion_message}
+
     def _format_message(self, message_to_user: str) -> str:
         message_to_user = message_to_user.replace("</details>\n\n", "</details>")
         message_to_user = message_to_user.replace("</details>\n", "</details>")

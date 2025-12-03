@@ -88,7 +88,13 @@ class DCustDevService(interface.IDCustDevService):
                         questions_id=questions_id,
                         result=str(custdev_result)
                     )
-                dialog_manager.dialog_data["message_to_user"] = "Спасибо за ваш отзыв!"
+
+                completion_message = (
+                    "Спасибо за ваш отзыв!\n\n"
+                    "Ваше мнение очень важно для нас и поможет улучшить наш продукт."
+                )
+                dialog_manager.dialog_data["completion_message"] = completion_message
+                await dialog_manager.switch_to(model.CustdevStates.completion)
                 return
 
             message_to_user = llm_response_json["message_to_user"]
