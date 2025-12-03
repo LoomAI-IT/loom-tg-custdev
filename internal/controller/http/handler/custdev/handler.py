@@ -87,7 +87,6 @@ class CustDevController(interface.ICustDevController):
         except json.JSONDecodeError:
             # Если не получилось, пробуем парсить как Python dict (старый формат)
             try:
-                import ast
                 data = ast.literal_eval(result)
                 if isinstance(data, dict):
                     return data.get("custdev_result", [])
@@ -99,13 +98,12 @@ class CustDevController(interface.ICustDevController):
                 raise ValueError(f"Invalid custdev result format: {str(e)}")
 
     def _generate_csv_content(self, custdev_records: list[dict]) -> str:
-        """Генерирует CSV контент с динамическими колонками."""
+        """Генерирует CSV контент с вопросами как заголовками."""
         if not custdev_records:
             return ""
 
-        # Парсим все результаты и находим макс. количество вопросов
+        # Парсим все результаты
         parsed_records = []
-        max_questions = 0
 
         for record in custdev_records:
             try:
@@ -114,37 +112,32 @@ class CustDevController(interface.ICustDevController):
                     'id': record['id'],
                     'qa_pairs': qa_pairs
                 })
-                max_questions = max(max_questions, len(qa_pairs))
             except ValueError as e:
                 self.logger.error(f"Error parsing custdev {record['id']}: {e}")
                 continue
 
+        if not parsed_records:
+            return ""
+
         # Генерируем CSV
         output = io.StringIO()
-
-        # Создаём динамические заголовки
-        headers = []
-        for i in range(1, max_questions + 1):
-            headers.extend([f'question_{i}', f'answer_{i}'])
-
         writer = csv.writer(output)
-        writer.writerow(headers)
 
-        # Записываем данные
+        # Для каждого custdev записываем вопросы как заголовки, ответы как значения
         for record in parsed_records:
-            row = []
             qa_pairs = record['qa_pairs']
 
-            for i in range(max_questions):
-                if i < len(qa_pairs):
-                    row.extend([
-                        qa_pairs[i].get('question', ''),
-                        qa_pairs[i].get('answer', '')
-                    ])
-                else:
-                    row.extend(['', ''])  # Пустые ячейки
+            # Заголовки = текст вопросов
+            headers = [qa_pair.get('question', '') for qa_pair in qa_pairs]
+            writer.writerow(headers)
 
-            writer.writerow(row)
+            # Значения = ответы
+            answers = [qa_pair.get('answer', '') for qa_pair in qa_pairs]
+            writer.writerow(answers)
+
+            # Пустая строка между разными custdev записями
+            if len(parsed_records) > 1:
+                writer.writerow([])
 
         return output.getvalue()
 
