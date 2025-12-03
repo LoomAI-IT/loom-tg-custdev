@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS llm_messages (
 create_custdev_questions_table = """
 CREATE TABLE IF NOT EXISTS custdev_questions (
     id SERIAL PRIMARY KEY,
-    questions JSONB NOT NULL
+    questions TEXT[] NOT NULL
 );
 """
 
