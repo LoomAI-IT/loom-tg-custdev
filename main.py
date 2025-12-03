@@ -137,7 +137,7 @@ custdev_dialog = CustDevDialog(
     custdev_getter,
 )
 
-command_controller = CommandController(tel, state_service)
+command_controller = CommandController(tel, state_service, llm_chat_repo)
 
 tg_middleware = TgMiddleware(
     tel,
