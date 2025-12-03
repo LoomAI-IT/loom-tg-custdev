@@ -5,7 +5,7 @@ from aiogram.types import Message
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.input import MessageInput
 
-from internal import interface
+from internal import interface, model
 from pkg.html_validator import validate_html
 from pkg.log_wrapper import auto_log
 from pkg.tg_action_wrapper import tg_action
