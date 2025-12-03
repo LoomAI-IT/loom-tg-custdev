@@ -24,74 +24,18 @@ from internal.controller.tg.middleware.middleware import TgMiddleware
 from internal.controller.tg.command.handler import CommandController
 from internal.controller.http.webhook.handler import TelegramWebhookController
 
-from internal.dialog.intro.dialog import IntroDialog
-from internal.dialog.main_menu.dialog import MainMenuDialog
-from internal.dialog.organization.organization_menu.dialog import OrganizationMenuDialog
-from internal.dialog.personal_profile.dialog import PersonalProfileDialog
-from internal.dialog.organization.change_employee.dialog import ChangeEmployeeDialog
-from internal.dialog.organization.add_employee.dialog import AddEmployeeDialog
-from internal.dialog.organization.add_social_netwok.dialog import AddSocialNetworkDialog
-from internal.dialog.content.content_menu.dialog import ContentMenuDialog
-from internal.dialog.content.generate_publication.dialog import GeneratePublicationDialog
-from internal.dialog.content.generate_video_cut.dialog import GenerateVideoCutDialog
-from internal.dialog.content.moderation_publication.dialog import ModerationPublicationDialog
-from internal.dialog.content.video_cut_draft_content.dialog import VideoCutsDraftDialog
-from internal.dialog.content.moderation_video_cut.dialog import VideoCutModerationDialog
-from internal.dialog.content.draft_publication.dialog import DraftPublicationDialog
-from internal.dialog.alerts.dialog import AlertsDialog
-from internal.dialog.brief.create_category.dialog import CreateCategoryDialog
-from internal.dialog.brief.create_organization.dialog import CreateOrganizationDialog
-from internal.dialog.brief.update_category.dialog import UpdateCategoryDialog
-from internal.dialog.brief.update_organization.dialog import UpdateOrganizationDialog
+from internal.dialog.custdev.dialog import CustDevDialog
 
 from internal.service.state.service import StateService
-from internal.dialog.intro.service import IntroService
-from internal.dialog.main_menu.service import MainMenuService
-from internal.dialog.organization.organization_menu.service import OrganizationMenuService
-from internal.dialog.content.content_menu.service import ContentMenuService
-from internal.dialog.personal_profile.service import PersonalProfileService
-from internal.dialog.organization.change_employee.service import ChangeEmployeeService
-from internal.dialog.organization.add_employee.service import AddEmployeeService
-from internal.dialog.organization.add_social_netwok.service import AddSocialNetworkService
-from internal.dialog.content.generate_publication.service import GeneratePublicationService
-from internal.dialog.content.generate_video_cut.service import GenerateVideoCutService
-from internal.dialog.content.moderation_publication.service import ModerationPublicationService
-from internal.dialog.content.video_cut_draft_content.service import VideoCutsDraftService
-from internal.dialog.content.moderation_video_cut.service import VideoCutModerationService
-from internal.dialog.content.draft_publication.service import DraftPublicationService
-from internal.dialog.alerts.service import AlertsService
-from internal.dialog.brief.create_category.service import CreateCategoryService
-from internal.dialog.brief.create_organization.service import CreateOrganizationService
-from internal.dialog.brief.update_category.service import UpdateCategoryService
-from internal.dialog.brief.update_organization.service import UpdateOrganizationService
+from internal.service.custdev.service import CustDevService
+from internal.dialog.custdev.service import DCustDevService
 
-from internal.dialog.intro.getter import IntroGetter
-from internal.dialog.main_menu.getter import MainMenuGetter
-from internal.dialog.organization.organization_menu.getter import OrganizationMenuGetter
-from internal.dialog.content.content_menu.getter import ContentMenuGetter
-from internal.dialog.personal_profile.getter import PersonalProfileGetter
-from internal.dialog.organization.change_employee.getter import ChangeEmployeeGetter
-from internal.dialog.organization.add_employee.getter import AddEmployeeGetter
-from internal.dialog.organization.add_social_netwok.getter import AddSocialNetworkGetter
-from internal.dialog.content.generate_publication.getter import GeneratePublicationDataGetter
-from internal.dialog.content.moderation_publication.getter import ModerationPublicationGetter
-from internal.dialog.content.generate_video_cut.getter import GenerateVideoCutGetter
-from internal.dialog.content.video_cut_draft_content.getter import VideoCutsDraftGetter
-from internal.dialog.content.moderation_video_cut.getter import VideoCutModerationGetter
-from internal.dialog.content.draft_publication.getter import DraftPublicationGetter
-from internal.dialog.alerts.getter import AlertsGetter
-from internal.dialog.brief.create_category.getter import CreateCategoryGetter
-from internal.dialog.brief.create_organization.getter import CreateOrganizationGetter
-from internal.dialog.brief.update_category.getter import UpdateCategoryGetter
-from internal.dialog.brief.update_organization.getter import UpdateOrganizationGetter
+from internal.dialog.custdev.getter import CustDevGetter
 
-from internal.dialog.brief.create_category.create_prompt import CreateCategoryPromptGenerator
-from internal.dialog.brief.create_category.train_prompt import TrainCategoryPromptGenerator
-from internal.dialog.brief.create_organization.prompt import CreateOrganizationPromptGenerator
-from internal.dialog.brief.update_category.prompt import UpdateCategoryPromptGenerator
-from internal.dialog.brief.update_organization.prompt import UpdateOrganizationPromptGenerator
+from internal.dialog.custdev.prompt import CustDevPromptGenerator
 
 from internal.repo.state.repo import StateRepo
+from internal.repo.custdev.repo import CustDevRepo
 from internal.repo.llm_chat.repo import LLMChatRepo
 
 from internal.app.tg.app import NewTg
@@ -145,137 +89,18 @@ bot.session.middleware(AiogramSulgukMiddleware())
 
 # Инициализация клиентов
 db = PG(tel, cfg.db_user, cfg.db_pass, cfg.db_host, cfg.db_port, cfg.db_name)
-loom_account_client = LoomAccountClient(tel, cfg.loom_account_host, cfg.loom_account_port, log_context)
-loom_authorization_client = LoomAuthorizationClient(tel, cfg.loom_authorization_host,
-                                                    cfg.loom_authorization_port, log_context)
-loom_employee_client = LoomEmployeeClient(tel, cfg.loom_employee_host, cfg.loom_employee_port, log_context)
-loom_organization_client = LoomOrganizationClient(
-    tel,
-    cfg.loom_organization_host,
-    cfg.loom_organization_port,
-    cfg.interserver_secret_key,
-    log_context
-)
-loom_content_client = LoomContentClient(tel, cfg.loom_content_host, cfg.loom_content_port, log_context)
 anthropic_client = AnthropicClient(
     tel,
     cfg.anthropic_api_key,
     proxy=cfg.proxy
 )
-telegram_client = LTelegramClient(
-    cfg.tg_bot_token,
-    cfg.tg_session_string,
-    cfg.tg_api_id,
-    cfg.tg_api_hash
-)
-
 state_repo = StateRepo(tel, db)
 llm_chat_repo = LLMChatRepo(tel, db)
 
 # Инициализация геттеров
-intro_getter = IntroGetter(
+custdev_getter = CustDevGetter(
     tel,
     state_repo,
-    cfg.domain
-)
-
-main_menu_getter = MainMenuGetter(
-    tel,
-    state_repo
-)
-
-organization_menu_getter = OrganizationMenuGetter(
-    tel,
-    state_repo,
-    loom_organization_client,
-    loom_employee_client,
-    loom_content_client,
-)
-
-content_menu_getter = ContentMenuGetter(
-    tel,
-    state_repo,
-    loom_employee_client,
-    loom_content_client,
-)
-generate_publication_getter = GeneratePublicationDataGetter(
-    tel,
-    bot,
-    state_repo,
-    loom_employee_client,
-    loom_content_client,
-)
-
-moderation_publication_getter = ModerationPublicationGetter(
-    tel,
-    bot,
-    state_repo,
-    loom_employee_client,
-    loom_content_client,
-    cfg.domain,
-)
-
-video_cut_moderation_getter = VideoCutModerationGetter(
-    tel,
-    state_repo,
-    loom_employee_client,
-    loom_content_client,
-)
-
-generate_video_cut_getter = GenerateVideoCutGetter(
-    tel,
-    state_repo
-)
-
-change_employee_getter = ChangeEmployeeGetter(
-    tel,
-    state_repo,
-    loom_employee_client,
-    loom_organization_client,
-    loom_content_client
-)
-
-personal_profile_getter = PersonalProfileGetter(
-    tel,
-    state_repo,
-    loom_employee_client,
-    loom_organization_client,
-    loom_content_client
-)
-
-video_cuts_draft_getter = VideoCutsDraftGetter(
-    tel,
-    state_repo,
-    loom_employee_client,
-    loom_organization_client,
-    loom_content_client,
-)
-
-draft_publication_getter = DraftPublicationGetter(
-    tel,
-    bot,
-    state_repo,
-    loom_employee_client,
-    loom_content_client,
-    cfg.domain,
-)
-
-add_employee_getter = AddEmployeeGetter(
-    tel,
-    state_repo,
-    loom_employee_client,
-)
-
-add_social_network_getter = AddSocialNetworkGetter(
-    tel,
-    state_repo,
-    loom_content_client,
-)
-
-alerts_getter = AlertsGetter(
-    tel,
-    state_repo,
-    loom_content_client,
 )
 
 # Инициализация промпт генераторов

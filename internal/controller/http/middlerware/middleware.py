@@ -9,7 +9,6 @@ from opentelemetry.trace import SpanKind, Status, StatusCode
 
 from internal import interface
 from internal import common
-from pkg.trace_wrapper import traced_method
 
 
 class HttpMiddleware(interface.IHttpMiddleware):
@@ -78,8 +77,6 @@ class HttpMiddleware(interface.IHttpMiddleware):
                 common.TELEGRAM_USER_USERNAME_KEY: request.headers.get(common.TELEGRAM_USER_USERNAME_KEY, ""),
                 common.TELEGRAM_CHAT_ID_KEY: request.headers.get(common.TELEGRAM_CHAT_ID_KEY, "0"),
                 common.TELEGRAM_EVENT_TYPE_KEY: request.headers.get(common.TELEGRAM_EVENT_TYPE_KEY, ""),
-                common.ORGANIZATION_ID_KEY: request.headers.get(common.ORGANIZATION_ID_KEY, "0"),
-                common.ACCOUNT_ID_KEY: request.headers.get(common.ACCOUNT_ID_KEY, "0"),
             })
             try:
                 response = await call_next(request)

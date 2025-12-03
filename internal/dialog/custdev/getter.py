@@ -1,35 +1,36 @@
-import re
-
 from aiogram import Bot
 from aiogram_dialog import DialogManager
 
 from internal import interface, model
+from main import add_employee_dialog
 from pkg.log_wrapper import auto_log
 from pkg.tg_action_wrapper import tg_action
 from pkg.trace_wrapper import traced_method
 
 
-class CreateOrganizationGetter(interface.ICreateOrganizationGetter):
+class CustDevGetter(interface.ICustDevGetter):
     def __init__(
             self,
             tel: interface.ITelemetry,
             bot: Bot,
             anthropic_client: interface.IAnthropicClient,
-            create_organization_prompt_generator: interface.ICreateOrganizationPromptGenerator,
+            custdev_service: interface.ICustDevService,
+            custdev_prompt_generator: interface.ICustDevPromptGenerator,
             llm_chat_repo: interface.ILLMChatRepo,
-            state_repo: interface.IStateRepo
+            state_repo: interface.IStateRepo,
     ):
         self.tracer = tel.tracer()
         self.logger = tel.logger()
         self.bot = bot
         self.anthropic_client = anthropic_client
-        self.create_organization_prompt_generator = create_organization_prompt_generator
+        self.custdev_prompt_generator = custdev_prompt_generator
         self.llm_chat_repo = llm_chat_repo
         self.state_repo = state_repo
+        self.custdev_service = custdev_service
 
     @auto_log()
     @traced_method()
-    async def get_create_organization_data(
+    async def get_custdev_data(
             self,
             dialog_manager: DialogManager,
             **kwargs
@@ -37,6 +38,8 @@ class CreateOrganizationGetter(interface.ICreateOrganizationGetter):
         state = await self._get_state(dialog_manager)
 
         chat_id = dialog_manager.dialog_data.get("chat_id")
+        questions_id = dialog_manager.dialog_data.get("questions_id")
+        questions = await self.custdev_service.get_questions_by_id(questions_id)
         if not chat_id:
             chat_id = await self.llm_chat_repo.create_chat(state.id)
             dialog_manager.dialog_data["chat_id"] = chat_id
@@ -54,7 +57,7 @@ class CreateOrganizationGetter(interface.ICreateOrganizationGetter):
                 }
             ]
 
-            system_prompt = await self.create_organization_prompt_generator.get_create_organization_system_prompt()
+            system_prompt = await self.custdev_prompt_generator.get_custdev_system_prompt(questions)
             async with tg_action(self.bot, dialog_manager.event.message.chat.id):
                 llm_response_json, _ = await self.anthropic_client.generate_json(
                     history=history,

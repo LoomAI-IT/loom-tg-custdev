@@ -1,20 +1,10 @@
 from enum import Enum
 
-
-class Role(Enum):
-    EMPLOYEE = "employee"
-    MODERATOR = "moderator"
-    ADMIN = "admin"
-
-
 TRACE_ID_KEY = "trace_id"
 SPAN_ID_KEY = "span_id"
 FILE_KEY = "file"
 ERROR_KEY = "error"
 TRACEBACK_KEY = "traceback"
-
-ORGANIZATION_ID_KEY = "organization.id"
-ACCOUNT_ID_KEY = "account.id"
 
 HTTP_METHOD_KEY = "http.request.method"
 HTTP_STATUS_KEY = "http.response.status_code"

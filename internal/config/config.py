@@ -5,27 +5,27 @@ class Config:
     def __init__(self):
         # Service configuration
         self.environment = os.getenv("ENVIRONMENT", "dev")
-        self.service_name = os.getenv("LOOM_TG_BOT_CONTAINER_NAME", "loom-tg-bot")
-        self.http_port = os.getenv("LOOM_TG_BOT_PORT", "8000")
+        self.service_name = os.getenv("LOOM_TG_CUSTDEV_CONTAINER_NAME", "loom-tg-bot")
+        self.http_port = os.getenv("LOOM_TG_CUSTDEV_PORT", "8000")
         self.service_version = os.getenv("SERVICE_VERSION", "1.0.0")
         self.root_path = os.getenv("ROOT_PATH", "/")
-        self.prefix = os.getenv("LOOM_TG_BOT_PREFIX", "/api/tg-bot")
+        self.prefix = os.getenv("LOOM_TG_CUSTDEV_PREFIX", "/api/tg-bot")
         self.log_level = os.getenv("LOG_LEVEL", "INFO")
-        self.tg_bot_token: str = os.environ.get('LOOM_TG_BOT_TOKEN')
+        self.tg_bot_token: str = os.environ.get('LOOM_TG_CUSTDEV_TOKEN')
         self.domain: str = os.environ.get("LOOM_DOMAIN")
         self.proxy: str = os.environ.get("PROXY")
 
         self.interserver_secret_key = os.getenv("LOOM_INTERSERVER_SECRET_KEY")
 
         # PostgreSQL configuration
-        self.db_host = os.getenv("LOOM_TG_BOT_POSTGRES_CONTAINER_NAME", "localhost")
+        self.db_host = os.getenv("LOOM_TG_CUSTDEV_POSTGRES_CONTAINER_NAME", "localhost")
         self.db_port = "5432"
-        self.db_name = os.getenv("LOOM_TG_BOT_POSTGRES_DB_NAME", "hr_interview")
-        self.db_user = os.getenv("LOOM_TG_BOT_POSTGRES_USER", "postgres")
-        self.db_pass = os.getenv("LOOM_TG_BOT_POSTGRES_PASSWORD", "password")
+        self.db_name = os.getenv("LOOM_TG_CUSTDEV_POSTGRES_DB_NAME", "hr_interview")
+        self.db_user = os.getenv("LOOM_TG_CUSTDEV_POSTGRES_USER", "postgres")
+        self.db_pass = os.getenv("LOOM_TG_CUSTDEV_POSTGRES_PASSWORD", "password")
 
         # Настройки телеметрии
-        self.alert_tg_bot_token = os.getenv("LOOM_ALERT_TG_BOT_TOKEN", "")
+        self.alert_tg_bot_token = os.getenv("LOOM_ALERT_TG_CUSTDEV_TOKEN", "")
         self.alert_tg_chat_id = int(os.getenv("LOOM_ALERT_TG_CHAT_ID", "0"))
         self.alert_tg_chat_thread_id = int(os.getenv("LOOM_ALERT_TG_CHAT_THREAD_ID", "0"))
         self.grafana_url = os.getenv("LOOM_GRAFANA_URL", "")
@@ -44,20 +44,3 @@ class Config:
 
         # Anthropic configuration
         self.anthropic_api_key = os.getenv("ANTHROPIC_API_KEY", "")
-
-        # Telegram Client configuration
-        self.tg_api_id: int = int(os.environ.get('LOOM_TG_API_ID'))
-        self.tg_api_hash: str = os.environ.get('LOOM_TG_API_HASH')
-        self.tg_session_string: str = os.environ.get('LOOM_TG_SESSION_STRING')
-
-        self.loom_account_host = os.getenv("LOOM_ACCOUNT_CONTAINER_NAME", "loom-account")
-        self.loom_authorization_host = os.getenv("LOOM_AUTHORIZATION_CONTAINER_NAME", "loom-authorization")
-        self.loom_employee_host = os.getenv("LOOM_EMPLOYEE_CONTAINER_NAME", "loom-employee")
-        self.loom_organization_host = os.getenv("LOOM_ORGANIZATION_CONTAINER_NAME", "loom-organization")
-        self.loom_content_host = os.getenv("LOOM_CONTENT_CONTAINER_NAME", "loom-content")
-
-        self.loom_account_port = int(os.getenv("LOOM_ACCOUNT_PORT", 8000))
-        self.loom_authorization_port = int(os.getenv("LOOM_AUTHORIZATION_PORT", 8000))
-        self.loom_employee_port = int(os.getenv("LOOM_EMPLOYEE_PORT", 8000))
-        self.loom_organization_port = int(os.getenv("LOOM_ORGANIZATION_PORT", 8000))
-        self.loom_content_port = int(os.getenv("LOOM_CONTENT_PORT", 8000))

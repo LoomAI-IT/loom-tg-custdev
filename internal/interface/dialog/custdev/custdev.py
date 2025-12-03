@@ -1,13 +1,14 @@
 from typing import Protocol
 from abc import abstractmethod
 
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import Message
 from aiogram_dialog import Dialog, DialogManager, Window
 from aiogram_dialog.widgets.input import MessageInput
-from aiogram_dialog.widgets.kbd import Button
+
+from internal import model
 
 
-class ICusDevDialog(Protocol):
+class ICustDevDialog(Protocol):
     @abstractmethod
     def get_dialog(self) -> Dialog:
         pass
@@ -17,7 +18,7 @@ class ICusDevDialog(Protocol):
         pass
 
 
-class ICusDevService(Protocol):
+class IDCustDevService(Protocol):
     @abstractmethod
     async def handle_user_message(
             self,
@@ -28,7 +29,7 @@ class ICusDevService(Protocol):
         pass
 
 
-class ICusDevGetter(Protocol):
+class ICustDevGetter(Protocol):
     @abstractmethod
     async def get_custdev_data(
             self,
@@ -37,7 +38,7 @@ class ICusDevGetter(Protocol):
         pass
 
 
-class ICusDevPromptGenerator(Protocol):
+class ICustDevPromptGenerator(Protocol):
     @abstractmethod
-    async def get_custdev_system_prompt(self, questions_id: int) -> str:
+    async def get_custdev_system_prompt(self, questions: model.CustDevQuestions) -> str:
         pass

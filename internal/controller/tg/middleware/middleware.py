@@ -51,8 +51,6 @@ class TgMiddleware(interface.ITelegramMiddleware):
             common.TELEGRAM_USER_USERNAME_KEY: tg_username,
             common.TELEGRAM_CHAT_ID_KEY: str(tg_chat_id),
             common.TELEGRAM_EVENT_TYPE_KEY: event_type,
-            common.ORGANIZATION_ID_KEY: str(user_state.organization_id),
-            common.ACCOUNT_ID_KEY: str(user_state.account_id),
         })
 
         try:
@@ -84,28 +82,12 @@ class TgMiddleware(interface.ITelegramMiddleware):
             chat_id=tg_chat_id,
         )
 
-        # Определяем состояние для запуска на основе данных пользователя
-        if user_state.organization_id == 0 and user_state.account_id == 0:
-            target_state = model.IntroStates.welcome
-            self.logger.info(f"Восстанавливаем в состояние авторизации для пользователя")
-        elif user_state.organization_id == 0 and user_state.account_id != 0:
-            target_state = model.IntroStates.intro
-            self.logger.info(f"Восстанавливаем в состояние отказа доступа для пользователя")
-        else:
-            target_state = model.MainMenuStates.main_menu
-            self.logger.info(f"Восстанавливаем в главное меню для пользователя")
-
         # Запускаем соответствующий диалог
         await dialog_manager.start(
-            target_state,
+            model.CustdevStates.custdev,
             mode=StartMode.RESET_STACK
         )
 
-        # Восстанавливаем флаг показа уведомлений
-        await self.state_service.change_user_state(
-            state_id=user_state.id,
-            can_show_alerts=True
-        )
         return True
 
     def __extract_metadata(self, event: Update):

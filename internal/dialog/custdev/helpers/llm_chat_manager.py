@@ -5,7 +5,6 @@ from aiogram_dialog import DialogManager
 from internal import interface
 from internal.dialog.helpers import MessageExtractor
 
-from internal.dialog.brief.helpers import LLMContextManager, TelegramPostFormatter
 from pkg.html_validator import validate_html
 
 
@@ -15,49 +14,37 @@ class LLMChatManager:
             logger,
             bot: Bot,
             anthropic_client: interface.IAnthropicClient,
-            loom_content_client: interface.ILoomContentClient,
-            create_organization_prompt_generator: interface.ICreateOrganizationPromptGenerator,
+            custdev_service: interface.ICustDevService,
+            custdev_prompt_generator: interface.ICustDevPromptGenerator,
             llm_chat_repo: interface.ILLMChatRepo,
+            openai_client: interface.IOpenAIClient,
     ):
         self.logger = logger
         self.bot = bot
         self.anthropic_client = anthropic_client
-        self.loom_content_client = loom_content_client
-        self.create_organization_prompt_generator = create_organization_prompt_generator
+        self.custdev_service = custdev_service
+        self.custdev_prompt_generator = custdev_prompt_generator
         self.llm_chat_repo = llm_chat_repo
 
         self.message_extractor = MessageExtractor(
             logger=self.logger,
             bot=self.bot,
-            loom_content_client=self.loom_content_client
+            openai_client=openai_client,
         )
-        self.llm_context_manager = LLMContextManager(
-            logger=self.logger,
-            anthropic_client=self.anthropic_client,
-            llm_chat_repo=self.llm_chat_repo,
-        )
-        self.telegram_post_formatter = TelegramPostFormatter()
 
     async def process_user_message(
             self,
             dialog_manager: DialogManager,
             message: Message,
             chat_id: int,
+            questions_id: int,
     ) -> dict:
-        user_text = await self.message_extractor.extract_text_from_message(
+        user_text = await self.message_extractor.process_voice_or_text_input(
             dialog_manager=dialog_manager,
             message=message,
-            organization_id=-1,
-            show_is_transcribe=False
         )
 
         message_to_llm = f"""
-<system>
-Оветь обязательно в JSON формате и очень хорошо подумай над тем что тебе сказали в глобальных правилах и в самом stage
-HTML разметка должны быть валидной, если есть открывающий тэг, значит должен быть закрывающий, закрывающий не должен существовать без открывающего
-ultrathink
-</system>
-
 <user>
 {user_text}
 </user>
@@ -69,9 +56,9 @@ ultrathink
         )
 
         llm_response_json, generate_cost = await self.get_llm_response(
-            dialog_manager=dialog_manager,
             chat_id=chat_id,
-            enable_web_search=True
+            enable_web_search=True,
+            questions_id=questions_id,
         )
 
         return llm_response_json
@@ -89,11 +76,11 @@ ultrathink
 
     async def get_llm_response(
             self,
-            dialog_manager: DialogManager,
             chat_id: int,
+            questions_id: int,
             max_tokens: int = 15000,
             thinking_tokens: int = 10000,
-            enable_web_search: bool = False
+            enable_web_search: bool = False,
     ) -> tuple[dict, dict]:
         messages = await self.llm_chat_repo.get_all_messages(chat_id)
         history = []
@@ -103,7 +90,8 @@ ultrathink
                 "content": msg.text
             })
 
-        system_prompt = await self.create_organization_prompt_generator.get_create_organization_system_prompt()
+        questions = await self.custdev_service.get_questions_by_id(questions_id)
+        system_prompt = await self.custdev_prompt_generator.get_custdev_system_prompt(questions)
         llm_response_json, generate_cost = await self.anthropic_client.generate_json(
             history=history,
             system_prompt=system_prompt,
@@ -125,10 +113,5 @@ ultrathink
                     enable_web_search=enable_web_search,
                     llm_model="claude-haiku-4-5-20251001"
                 )
-
-        self.llm_context_manager.track_tokens(
-            dialog_manager=dialog_manager,
-            generate_cost=generate_cost
-        )
 
         return llm_response_json, generate_cost

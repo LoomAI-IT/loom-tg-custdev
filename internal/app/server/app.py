@@ -47,42 +47,6 @@ def include_tg_webhook(
         methods=["POST"]
     )
 
-    app.add_api_route(
-        prefix + "/employee/notify/added",
-        tg_webhook_controller.notify_employee_added,
-        methods=["POST"]
-    )
-
-    app.add_api_route(
-        prefix + "/employee/notify/deleted",
-        tg_webhook_controller.notify_employee_deleted,
-        methods=["POST"]
-    )
-
-    app.add_api_route(
-        prefix + "/video-cut/vizard/notify/generated",
-        tg_webhook_controller.notify_vizard_video_cut_generated,
-        methods=["POST"]
-    )
-
-    app.add_api_route(
-        prefix + "/notify/publication/approved",
-        tg_webhook_controller.notify_publication_approved_alert,
-        methods=["POST"]
-    )
-
-    app.add_api_route(
-        prefix + "/notify/publication/rejected",
-        tg_webhook_controller.notify_publication_rejected_alert,
-        methods=["POST"]
-    )
-
-    app.add_api_route(
-        prefix + "/file/cache",
-        tg_webhook_controller.set_cache_file,
-        methods=["POST"]
-    )
-
 
 def include_db_handler(app: FastAPI, db: interface.IDB, prefix: str, environment: str):
     app.add_api_route(prefix + "/table/create", create_table_handler(db), methods=["GET"])

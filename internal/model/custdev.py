@@ -6,6 +6,7 @@ from datetime import datetime
 class CustDev:
     id: int
     state_id: int
+    questions_id: int
     result: str
     created_at: datetime
 
@@ -15,6 +16,7 @@ class CustDev:
             cls(
                 id=row.id,
                 state_id=row.state_id,
+                questions_id=row.questions_id,
                 result=row.result,
                 created_at=row.created_at,
             )

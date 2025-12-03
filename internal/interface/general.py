@@ -1,14 +1,11 @@
 from abc import abstractmethod
-from typing import Protocol, Sequence, Any, Annotated, Callable, Awaitable
+from typing import Protocol, Sequence, Any, Annotated, Callable, Awaitable, Literal
 
-from aiogram.types import TelegramObject, Update, Message, ErrorEvent
+from aiogram.types import TelegramObject, Update, Message
 from aiogram_dialog import DialogManager
 from fastapi import FastAPI, Header
-from fastapi.responses import JSONResponse
 from opentelemetry.metrics import Meter
 from opentelemetry.trace import Tracer
-
-from internal.controller.http.webhook.model import *
 
 
 class ICommandController(Protocol):
@@ -139,3 +136,19 @@ class IAnthropicClient(Protocol):
             max_searches: int = 5,
             images: list[bytes] = None,
     ) -> tuple[dict, dict]: pass
+
+class IOpenAIClient(Protocol):
+
+    @abstractmethod
+    async def transcribe_audio(
+            self,
+            audio_file: bytes,
+            filename: str,
+            audio_model: str,
+            language: str = None,
+            prompt: str = None,
+            response_format: Literal["json", "text", "srt", "verbose_json", "vtt"] = "verbose_json",
+            temperature: float = None,
+            timestamp_granularities: list[Literal["word", "segment"]] = None
+    ) -> tuple[str, dict]: pass
+
