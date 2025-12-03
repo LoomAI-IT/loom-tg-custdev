@@ -36,6 +36,7 @@ class TgMiddleware(interface.ITelegramMiddleware):
             data: dict[str, Any]
     ):
         message, event_type, message_text, tg_username, tg_chat_id, message_id = self.__extract_metadata(event)
+        self.logger.info(f"{event=}")
 
         try:
             user_state = await self.state_service.state_by_id(tg_chat_id)

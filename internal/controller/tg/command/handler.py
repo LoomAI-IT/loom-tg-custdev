@@ -1,4 +1,5 @@
 from aiogram.types import Message
+from aiogram.filters import CommandObject
 from aiogram_dialog import DialogManager, StartMode
 
 from internal import model, interface
@@ -22,7 +23,8 @@ class CommandController(interface.ICommandController):
     async def start_handler(
             self,
             message: Message,
-            dialog_manager: DialogManager
+            dialog_manager: DialogManager,
+            command: CommandObject
     ):
         await dialog_manager.reset_stack()
 
@@ -33,7 +35,13 @@ class CommandController(interface.ICommandController):
             tg_username = message.from_user.username if message.from_user.username else "отсутвует username"
             await self.state_service.create_state(tg_chat_id, tg_username)
 
+        # Получаем questions_id из параметров команды /start
+        start_data = {}
+        if command.args:
+            start_data["questions_id"] = command.args
+
         await dialog_manager.start(
             model.CustdevStates.hello,
-            mode=StartMode.RESET_STACK
+            mode=StartMode.RESET_STACK,
+            data=start_data
         )
