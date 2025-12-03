@@ -35,7 +35,7 @@ class CustDevGetter(interface.ICustDevGetter):
             **kwargs
     ) -> dict:
         questions_id = dialog_manager.start_data.get("questions_id")
-        dialog_manager.dialog_data["questions_id"] = questions_id
+        dialog_manager.dialog_data["questions_id"] = int(questions_id)
 
         return {"questions_id": questions_id}
 
