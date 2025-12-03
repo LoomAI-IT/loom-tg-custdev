@@ -84,7 +84,7 @@ class TgMiddleware(interface.ITelegramMiddleware):
 
         # Запускаем соответствующий диалог
         await dialog_manager.start(
-            model.CustdevStates.custdev,
+            model.CustdevStates.hello,
             mode=StartMode.RESET_STACK
         )
 
