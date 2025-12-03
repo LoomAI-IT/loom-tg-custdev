@@ -29,6 +29,18 @@ class CustDevGetter(interface.ICustDevGetter):
 
     @auto_log()
     @traced_method()
+    async def get_hello_data(
+            self,
+            dialog_manager: DialogManager,
+            **kwargs
+    ) -> dict:
+        questions_id = dialog_manager.start_data.get("questions_id")
+        dialog_manager.dialog_data["questions_id"] = questions_id
+
+        return {"questions_id": questions_id}
+
+    @auto_log()
+    @traced_method()
     async def get_custdev_data(
             self,
             dialog_manager: DialogManager,
@@ -37,12 +49,7 @@ class CustDevGetter(interface.ICustDevGetter):
         state = await self._get_state(dialog_manager)
 
         chat_id = dialog_manager.dialog_data.get("chat_id")
-        questions_id = dialog_manager.dialog_data.get("questions_id")
-        if not questions_id:
-            questions_id = 1
-            dialog_manager.dialog_data["questions_id"] = questions_id
 
-        questions = await self.custdev_service.get_questions_by_id(questions_id)
         if not chat_id:
             chat_id = await self.llm_chat_repo.create_chat(state.id)
             dialog_manager.dialog_data["chat_id"] = chat_id
@@ -60,19 +67,16 @@ class CustDevGetter(interface.ICustDevGetter):
                 }
             ]
 
-            try:
-                system_prompt = await self.custdev_prompt_generator.get_custdev_system_prompt(questions)
-                async with tg_action(self.bot, dialog_manager.event.message.chat.id):
-                    llm_response_json, _ = await self.anthropic_client.generate_json(
-                        history=history,
-                        system_prompt=system_prompt,
-                        temperature=1,
-                        enable_web_search=False
-                    )
-            except:
-                return {
-            "message_to_user": 'erewew',
-        }
+            questions_id = dialog_manager.dialog_data.get("questions_id")
+            questions = await self.custdev_service.get_questions_by_id(questions_id)
+            system_prompt = await self.custdev_prompt_generator.get_custdev_system_prompt(questions)
+            async with tg_action(self.bot, dialog_manager.event.message.chat.id):
+                llm_response_json, _ = await self.anthropic_client.generate_json(
+                    history=history,
+                    system_prompt=system_prompt,
+                    temperature=1,
+                    enable_web_search=False
+                )
 
             message_to_user = llm_response_json["message_to_user"]
             await self.llm_chat_repo.create_message(

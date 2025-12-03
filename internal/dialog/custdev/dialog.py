@@ -27,13 +27,14 @@ class CustDevDialog(interface.ICustDevDialog):
 
     def get_intro_window(self) -> Window:
         return Window(
-            Format("Добро пожаловать!"),
+            Format("Добро пожаловать! {questions_id}"),
             Button(
-                Const("Начать опрос"),
+                Format("Начать опрос"),
                 id="show_confirm_cancel",
                 on_click=lambda c, b, d: d.switch_to(model.CustdevStates.custdev),
             ),
             state=model.CustdevStates.hello,
+            getter=self.custdev_getter.get_hello_data,
         )
 
     def get_custdev_window(self) -> Window:

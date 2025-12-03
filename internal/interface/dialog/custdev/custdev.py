@@ -35,6 +35,13 @@ class IDCustDevService(Protocol):
 
 class ICustDevGetter(Protocol):
     @abstractmethod
+    async def get_hello_data(
+            self,
+            dialog_manager: DialogManager,
+    ) -> dict:
+        pass
+
+    @abstractmethod
     async def get_custdev_data(
             self,
             dialog_manager: DialogManager,
