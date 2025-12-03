@@ -38,6 +38,10 @@ class CustDevGetter(interface.ICustDevGetter):
 
         chat_id = dialog_manager.dialog_data.get("chat_id")
         questions_id = dialog_manager.dialog_data.get("questions_id")
+        if not questions_id:
+            questions_id = 1
+            dialog_manager.dialog_data["questions_id"] = questions_id
+
         questions = await self.custdev_service.get_questions_by_id(questions_id)
         if not chat_id:
             chat_id = await self.llm_chat_repo.create_chat(state.id)
