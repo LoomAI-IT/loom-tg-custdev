@@ -29,7 +29,13 @@ class CommandController(interface.ICommandController):
             command: CommandObject
     ):
         tg_chat_id = dialog_manager.event.chat.id
-        user_state = (await self.state_service.state_by_id(tg_chat_id))[0]
+        tg_username = dialog_manager.event.from_user.username
+
+        user_state = await self.state_service.state_by_id(tg_chat_id)
+        if not user_state:
+            await self.state_service.create_state(tg_chat_id, tg_username)
+            user_state = await self.state_service.state_by_id(tg_chat_id)
+        user_state = user_state[0]
 
         start_data = {}
         if command.args:
