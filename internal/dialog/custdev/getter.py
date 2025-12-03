@@ -69,7 +69,7 @@ class CustDevGetter(interface.ICustDevGetter):
 
             questions_id = dialog_manager.dialog_data.get("questions_id")
             questions = await self.custdev_service.get_questions_by_id(questions_id)
-            system_prompt = await self.custdev_prompt_generator.get_custdev_system_prompt(questions)
+            system_prompt = await self.custdev_prompt_generator.get_custdev_system_prompt(questions[0])
             async with tg_action(self.bot, dialog_manager.event.message.chat.id):
                 llm_response_json, _ = await self.anthropic_client.generate_json(
                     history=history,
