@@ -26,16 +26,12 @@ class CommandController(interface.ICommandController):
             dialog_manager: DialogManager,
             command: CommandObject
     ):
-        await dialog_manager.reset_stack()
-
         tg_chat_id = dialog_manager.event.chat.id
-
         user_state = await self.state_service.state_by_id(tg_chat_id)
         if not user_state:
             tg_username = message.from_user.username if message.from_user.username else "отсутвует username"
             await self.state_service.create_state(tg_chat_id, tg_username)
 
-        # Получаем questions_id из параметров команды /start
         start_data = {}
         if command.args:
             start_data["questions_id"] = command.args
