@@ -71,7 +71,7 @@ redis_client = redis.Redis(
     host=cfg.monitoring_redis_host,
     port=cfg.monitoring_redis_port,
     password=cfg.monitoring_redis_password,
-    db=5
+    db=4
 )
 key_builder = DefaultKeyBuilder(with_destiny=True)
 storage = RedisStorage(
