@@ -123,3 +123,15 @@ def include_custdev_routes(
         custdev_controller.delete_questions,
         methods=["DELETE"]
     )
+
+    app.add_api_route(
+        prefix + "/custdev/{custdev_id}/csv",
+        custdev_controller.get_custdev_by_id_csv,
+        methods=["GET"]
+    )
+
+    app.add_api_route(
+        prefix + "/custdev/export/csv",
+        custdev_controller.export_all_custdev_csv,
+        methods=["GET"]
+    )

@@ -28,6 +28,14 @@ class CustDevRepo(interface.ICustDevRepo):
             rows = model.CustDev.serialize(rows)
         return rows
 
+    @traced_method()
+    async def get_custdev_by_id(self, custdev_id: int) -> list[model.CustDev]:
+        args = {'custdev_id': custdev_id}
+        rows = await self.db.select(get_custdev_by_id_query, args)
+        if rows:
+            rows = model.CustDev.serialize(rows)
+        return rows
+
     # CustDevQuestions operations
     @traced_method()
     async def create_questions(self, questions: list[str]) -> int:

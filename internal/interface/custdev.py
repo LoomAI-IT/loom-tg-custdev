@@ -31,6 +31,14 @@ class ICustDevController(Protocol):
     async def delete_questions(self, questions_id: int) -> dict:
         pass
 
+    @abstractmethod
+    async def get_custdev_by_id_csv(self, custdev_id: int):
+        pass
+
+    @abstractmethod
+    async def export_all_custdev_csv(self):
+        pass
+
 
 class ICustDevService(Protocol):
     @abstractmethod
@@ -59,6 +67,10 @@ class ICustDevService(Protocol):
 
     @abstractmethod
     async def get_all_custdev(self) -> list[model.CustDev]:
+        pass
+
+    @abstractmethod
+    async def get_custdev_by_id(self, custdev_id: int) -> list[model.CustDev]:
         pass
 
 
@@ -91,4 +103,8 @@ class ICustDevRepo(Protocol):
 
     @abstractmethod
     async def get_all_custdev(self) -> list[model.CustDev]:
+        pass
+
+    @abstractmethod
+    async def get_custdev_by_id(self, custdev_id: int) -> list[model.CustDev]:
         pass

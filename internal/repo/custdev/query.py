@@ -9,6 +9,11 @@ get_all_custdev_query = """
 SELECT * FROM custdev
 """
 
+get_custdev_by_id_query = """
+SELECT * FROM custdev
+WHERE id = :custdev_id;
+"""
+
 # Queries for custdev_questions table
 create_questions_query = """
 INSERT INTO custdev_questions (questions)

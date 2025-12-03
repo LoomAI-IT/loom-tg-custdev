@@ -2,6 +2,14 @@ from internal import interface
 from pkg.log_wrapper import auto_log
 from pkg.trace_wrapper import traced_method
 
+import json
+import csv
+import io
+import zipfile
+from datetime import datetime
+from fastapi.responses import StreamingResponse
+from fastapi import HTTPException
+
 from .model import *
 
 
@@ -68,3 +76,135 @@ class CustDevController(interface.ICustDevController):
     async def delete_questions(self, questions_id: int):
         await self.custdev_service.delete_questions(questions_id)
         return {"success": True}
+
+    def _parse_custdev_result(self, result: str) -> list[dict]:
+        """Парсит JSON из поля result в список вопрос-ответ."""
+        try:
+            data = json.loads(result)
+            return data.get("custdev_result", [])
+        except (json.JSONDecodeError, KeyError) as e:
+            raise ValueError(f"Invalid custdev result format: {str(e)}")
+
+    def _generate_csv_content(self, custdev_records: list[dict]) -> str:
+        """Генерирует CSV контент с динамическими колонками."""
+        if not custdev_records:
+            return ""
+
+        # Парсим все результаты и находим макс. количество вопросов
+        parsed_records = []
+        max_questions = 0
+
+        for record in custdev_records:
+            try:
+                qa_pairs = self._parse_custdev_result(record['result'])
+                parsed_records.append({
+                    'id': record['id'],
+                    'qa_pairs': qa_pairs
+                })
+                max_questions = max(max_questions, len(qa_pairs))
+            except ValueError as e:
+                self.logger.error(f"Error parsing custdev {record['id']}: {e}")
+                continue
+
+        # Генерируем CSV
+        output = io.StringIO()
+
+        # Создаём динамические заголовки
+        headers = []
+        for i in range(1, max_questions + 1):
+            headers.extend([f'question_{i}', f'answer_{i}'])
+
+        writer = csv.writer(output)
+        writer.writerow(headers)
+
+        # Записываем данные
+        for record in parsed_records:
+            row = []
+            qa_pairs = record['qa_pairs']
+
+            for i in range(max_questions):
+                if i < len(qa_pairs):
+                    row.extend([
+                        qa_pairs[i].get('question', ''),
+                        qa_pairs[i].get('answer', '')
+                    ])
+                else:
+                    row.extend(['', ''])  # Пустые ячейки
+
+            writer.writerow(row)
+
+        return output.getvalue()
+
+    @traced_method()
+    @auto_log()
+    async def get_custdev_by_id_csv(self, custdev_id: int):
+        """Экспорт одного custdev в CSV."""
+        custdev_list = await self.custdev_service.get_custdev_by_id(custdev_id)
+
+        if not custdev_list:
+            raise HTTPException(status_code=404, detail=f"Custdev {custdev_id} not found")
+
+        custdev = custdev_list[0]
+        questions = (await self.custdev_service.get_questions_by_id(custdev.questions_id))[0]
+
+        record = {
+            "id": custdev.id,
+            "questions": questions.questions,
+            "result": custdev.result
+        }
+
+        try:
+            csv_content = self._generate_csv_content([record])
+        except Exception as e:
+            self.logger.error(f"Error generating CSV for custdev {custdev_id}: {e}")
+            raise HTTPException(status_code=500, detail=f"Error generating CSV: {str(e)}")
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"custdev_{custdev_id}_{timestamp}.csv"
+
+        return StreamingResponse(
+            iter([csv_content]),
+            media_type="text/csv",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+
+    @traced_method()
+    @auto_log()
+    async def export_all_custdev_csv(self):
+        """Экспорт всех custdev в ZIP архив."""
+        all_custdev = await self.custdev_service.get_all_custdev()
+
+        if not all_custdev:
+            raise HTTPException(status_code=404, detail="No custdev records found")
+
+        zip_buffer = io.BytesIO()
+
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            for custdev in all_custdev:
+                try:
+                    questions = (await self.custdev_service.get_questions_by_id(custdev.questions_id))[0]
+
+                    record = {
+                        "id": custdev.id,
+                        "questions": questions.questions,
+                        "result": custdev.result
+                    }
+
+                    csv_content = self._generate_csv_content([record])
+                    filename = f"custdev_{custdev.id}.csv"
+                    zip_file.writestr(filename, csv_content)
+
+                except Exception as e:
+                    self.logger.error(f"Error processing custdev {custdev.id}: {e}")
+                    continue
+
+        zip_buffer.seek(0)
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"custdev_export_{timestamp}.zip"
+
+        return StreamingResponse(
+            iter([zip_buffer.getvalue()]),
+            media_type="application/zip",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
