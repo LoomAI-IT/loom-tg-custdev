@@ -90,7 +90,7 @@ class LLMChatManager:
                 "content": msg.text
             })
 
-        questions = await self.custdev_service.get_questions_by_id(questions_id)
+        questions = (await self.custdev_service.get_questions_by_id(questions_id))[0]
         system_prompt = await self.custdev_prompt_generator.get_custdev_system_prompt(questions)
         llm_response_json, generate_cost = await self.anthropic_client.generate_json(
             history=history,

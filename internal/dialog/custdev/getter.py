@@ -54,7 +54,7 @@ class CustDevGetter(interface.ICustDevGetter):
             chat_id = await self.llm_chat_repo.create_chat(state.id)
             dialog_manager.dialog_data["chat_id"] = chat_id
 
-            user_text = "Привет, помоги мне создать профиль моей организации"
+            user_text = "Привет"
             await self.llm_chat_repo.create_message(
                 chat_id=chat_id,
                 role="user",
