@@ -59,32 +59,27 @@ class CustDevPromptGenerator(interface.ICustDevPromptGenerator):
     <boundary>Если респондент не хочет отвечать — уважай это и переходи дальше</boundary>
 </boundaries>
 
-<interview_completion>
-    <trigger>
-        Когда все вопросы заданы и раскрыты, или респондент явно хочет завершить разговор
-    </trigger>
 
-    <output_instruction>
-        Когда интервью завершено, выведи ТОЛЬКО JSON-блок с результатами.
-        Все сообщение пользователю должно быть в поле message_to_user.
-        Когда получишь ответы на все вопросы, то включи в JSON поле custdev_result.
-        НЕ пиши ничего до или после JSON-блока!
-    </output_instruction>
+<output_instruction>
+    ВСЕГДА возвращай ответ в формате JSON, СТРОГО соблюдай типы данных
+    Все сообщение пользователю должно быть в поле message_to_user.
+    Когда получишь ответы на все вопросы, то включи в JSON поле custdev_result.
+    НЕ пиши ничего до или после JSON-блока!
+</output_instruction>
 
-    <json_schema>
-        {{
-            "message_to_user": "сообщение респонденту",
-            "custdev_result": "описание всего что сказал респондент после того как был получен ответ на последний вопрос"
-        }}
-    </json_schema>
+<json_schema>
+    {{
+        "message_to_user": "сообщение респонденту",
+        "custdev_result": "описание всего что сказал респондент после того как был получен ответ на последний вопрос"
+    }}
+</json_schema>
 
-    <json_rules>
-        <rule>message_to_user — сообщение респонденту</rule>
-        <rule>Заполняй только те поля, для которых есть данные из разговора</rule>
-        <rule>Не додумывай — если информации нет, ставь null</rule>
-        <rule>Цитаты бери дословно из сообщений респондента</rule>
-        <rule>severity определяй по эмоциональности и частоте упоминания</rule>
-        <rule>interest_level оценивай по вовлечённости в разговор</rule>
-    </json_rules>
-</interview_completion>
+<json_rules>
+    <rule>message_to_user — сообщение респонденту</rule>
+    <rule>Заполняй только те поля, для которых есть данные из разговора</rule>
+    <rule>Не додумывай — если информации нет, ставь null</rule>
+    <rule>Цитаты бери дословно из сообщений респондента</rule>
+    <rule>severity определяй по эмоциональности и частоте упоминания</rule>
+    <rule>interest_level оценивай по вовлечённости в разговор</rule>
+</json_rules>
 """
