@@ -74,7 +74,6 @@ class DCustDevService(interface.IDCustDevService):
 
             async with tg_action(self.bot, message.chat.id):
                 llm_response_json = await self.llm_chat_manager.process_user_message(
-                    dialog_manager=dialog_manager,
                     message=message,
                     chat_id=chat_id,
                     questions_id=questions_id
@@ -87,7 +86,7 @@ class DCustDevService(interface.IDCustDevService):
                     _ = await self.custdev_service.create_custdev(
                         state_id=state.id,
                         questions_id=questions_id,
-                        result=custdev_result
+                        result=str(custdev_result)
                     )
                 dialog_manager.dialog_data["message_to_user"] = "Спасибо за ваш отзыв!"
                 return

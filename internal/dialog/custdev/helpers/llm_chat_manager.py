@@ -34,13 +34,11 @@ class LLMChatManager:
 
     async def process_user_message(
             self,
-            dialog_manager: DialogManager,
             message: Message,
             chat_id: int,
             questions_id: int,
     ) -> dict:
         user_text = await self.message_extractor.process_voice_or_text_input(
-            dialog_manager=dialog_manager,
             message=message,
         )
 

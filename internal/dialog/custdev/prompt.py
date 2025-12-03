@@ -75,7 +75,13 @@ class CustDevPromptGenerator(interface.ICustDevPromptGenerator):
 <json_schema>
     {{
         "message_to_user": "HTML-форматированное сообщение",
-        "custdev_result": "описание всего что сказал респондент после того как был получен ответ на последний вопрос"
+        "custdev_result": [
+            {{
+                "id": "номер вопроса",
+                "question": "текст вопроса",
+                "answer": "ответ на вопрос",
+            }}
+        ]
     }}
 </json_schema>
 
