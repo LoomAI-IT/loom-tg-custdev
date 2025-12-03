@@ -6,6 +6,7 @@ import json
 import csv
 import io
 import zipfile
+import ast
 from datetime import datetime
 from fastapi.responses import StreamingResponse
 from fastapi import HTTPException
@@ -80,10 +81,22 @@ class CustDevController(interface.ICustDevController):
     def _parse_custdev_result(self, result: str) -> list[dict]:
         """Парсит JSON из поля result в список вопрос-ответ."""
         try:
+            # Пробуем сначала парсить как JSON
             data = json.loads(result)
             return data.get("custdev_result", [])
-        except (json.JSONDecodeError, KeyError) as e:
-            raise ValueError(f"Invalid custdev result format: {str(e)}")
+        except json.JSONDecodeError:
+            # Если не получилось, пробуем парсить как Python dict (старый формат)
+            try:
+                import ast
+                data = ast.literal_eval(result)
+                if isinstance(data, dict):
+                    return data.get("custdev_result", [])
+                elif isinstance(data, list):
+                    return data
+                else:
+                    raise ValueError(f"Unexpected data type: {type(data)}")
+            except (ValueError, SyntaxError) as e:
+                raise ValueError(f"Invalid custdev result format: {str(e)}")
 
     def _generate_csv_content(self, custdev_records: list[dict]) -> str:
         """Генерирует CSV контент с динамическими колонками."""

@@ -83,10 +83,11 @@ class DCustDevService(interface.IDCustDevService):
                 custdev_result = llm_response_json["custdev_result"]
 
                 async with tg_action(self.bot, message.chat.id):
+                    import json
                     _ = await self.custdev_service.create_custdev(
                         state_id=state.id,
                         questions_id=questions_id,
-                        result=str(custdev_result)
+                        result=json.dumps(custdev_result, ensure_ascii=False)
                     )
 
                 completion_message = (
