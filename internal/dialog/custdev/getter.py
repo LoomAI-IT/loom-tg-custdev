@@ -60,14 +60,19 @@ class CustDevGetter(interface.ICustDevGetter):
                 }
             ]
 
-            system_prompt = await self.custdev_prompt_generator.get_custdev_system_prompt(questions)
-            async with tg_action(self.bot, dialog_manager.event.message.chat.id):
-                llm_response_json, _ = await self.anthropic_client.generate_json(
-                    history=history,
-                    system_prompt=system_prompt,
-                    temperature=1,
-                    enable_web_search=False
-                )
+            try:
+                system_prompt = await self.custdev_prompt_generator.get_custdev_system_prompt(questions)
+                async with tg_action(self.bot, dialog_manager.event.message.chat.id):
+                    llm_response_json, _ = await self.anthropic_client.generate_json(
+                        history=history,
+                        system_prompt=system_prompt,
+                        temperature=1,
+                        enable_web_search=False
+                    )
+            except:
+                return {
+            "message_to_user": 'erewew',
+        }
 
             message_to_user = llm_response_json["message_to_user"]
             await self.llm_chat_repo.create_message(

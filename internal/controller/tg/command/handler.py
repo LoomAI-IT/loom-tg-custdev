@@ -1,8 +1,5 @@
-import traceback
-
 from aiogram.types import Message
 from aiogram_dialog import DialogManager, StartMode
-from opentelemetry.trace import SpanKind, StatusCode
 
 from internal import model, interface
 from pkg.log_wrapper import auto_log
