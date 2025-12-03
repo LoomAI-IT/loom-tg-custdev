@@ -119,7 +119,7 @@ class CustDevController(interface.ICustDevController):
 
         # Генерируем CSV
         output = io.StringIO()
-        writer = csv.writer(output)
+        writer = csv.writer(output, delimiter=';')
 
         # Для каждого custdev записываем вопросы как заголовки, ответы как значения
         for record in parsed_records:
