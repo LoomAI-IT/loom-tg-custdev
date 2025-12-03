@@ -131,7 +131,7 @@ def include_custdev_routes(
     )
 
     app.add_api_route(
-        prefix + "/custdev/export/csv",
+        prefix + "/custdev/all/export/csv",
         custdev_controller.export_all_custdev_csv,
         methods=["GET"]
     )
