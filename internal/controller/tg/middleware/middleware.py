@@ -38,6 +38,16 @@ class TgMiddleware(interface.ITelegramMiddleware):
         message, event_type, message_text, tg_username, tg_chat_id, message_id = self.__extract_metadata(event)
         self.logger.info(f"{event=}")
 
+        try:
+            user_state = await self.state_service.state_by_id(tg_chat_id)
+            if not user_state:
+                await self.state_service.create_state(tg_chat_id, tg_username)
+                user_state = await self.state_service.state_by_id(tg_chat_id)
+            user_state = user_state[0]
+        except Exception as e:
+            self.logger.error("Ошибка!!!", {"traceback": traceback.format_exc()})
+            raise e
+
         context_token = self.log_context.set({
             common.TELEGRAM_USER_USERNAME_KEY: tg_username,
             common.TELEGRAM_CHAT_ID_KEY: str(tg_chat_id),
