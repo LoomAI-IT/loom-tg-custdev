@@ -2,7 +2,6 @@ from aiogram import Bot
 from aiogram_dialog import DialogManager
 
 from internal import interface, model
-from main import add_employee_dialog
 from pkg.log_wrapper import auto_log
 from pkg.tg_action_wrapper import tg_action
 from pkg.trace_wrapper import traced_method
@@ -30,6 +29,18 @@ class CustDevGetter(interface.ICustDevGetter):
 
     @auto_log()
     @traced_method()
+    async def get_hello_data(
+            self,
+            dialog_manager: DialogManager,
+            **kwargs
+    ) -> dict:
+        questions_id = dialog_manager.start_data.get("questions_id")
+        dialog_manager.dialog_data["questions_id"] = int(questions_id)
+
+        return {"questions_id": questions_id}
+
+    @auto_log()
+    @traced_method()
     async def get_custdev_data(
             self,
             dialog_manager: DialogManager,
@@ -38,13 +49,12 @@ class CustDevGetter(interface.ICustDevGetter):
         state = await self._get_state(dialog_manager)
 
         chat_id = dialog_manager.dialog_data.get("chat_id")
-        questions_id = dialog_manager.dialog_data.get("questions_id")
-        questions = await self.custdev_service.get_questions_by_id(questions_id)
+
         if not chat_id:
             chat_id = await self.llm_chat_repo.create_chat(state.id)
             dialog_manager.dialog_data["chat_id"] = chat_id
 
-            user_text = "Привет, помоги мне создать профиль моей организации"
+            user_text = "Привет"
             await self.llm_chat_repo.create_message(
                 chat_id=chat_id,
                 role="user",
@@ -57,7 +67,9 @@ class CustDevGetter(interface.ICustDevGetter):
                 }
             ]
 
-            system_prompt = await self.custdev_prompt_generator.get_custdev_system_prompt(questions)
+            questions_id = dialog_manager.dialog_data.get("questions_id")
+            questions = await self.custdev_service.get_questions_by_id(questions_id)
+            system_prompt = await self.custdev_prompt_generator.get_custdev_system_prompt(questions[0])
             async with tg_action(self.bot, dialog_manager.event.message.chat.id):
                 llm_response_json, _ = await self.anthropic_client.generate_json(
                     history=history,
@@ -80,6 +92,20 @@ class CustDevGetter(interface.ICustDevGetter):
         }
 
         return data
+
+    @auto_log()
+    @traced_method()
+    async def get_completion_data(
+            self,
+            dialog_manager: DialogManager,
+            **kwargs
+    ) -> dict:
+        completion_message = dialog_manager.dialog_data.get(
+            "completion_message",
+            "Спасибо за ваш отзыв!"
+        )
+
+        return {"completion_message": completion_message}
 
     def _format_message(self, message_to_user: str) -> str:
         message_to_user = message_to_user.replace("</details>\n\n", "</details>")

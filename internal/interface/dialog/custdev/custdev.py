@@ -14,7 +14,15 @@ class ICustDevDialog(Protocol):
         pass
 
     @abstractmethod
+    def get_intro_window(self) -> Window:
+        pass
+
+    @abstractmethod
     def get_custdev_window(self) -> Window:
+        pass
+
+    @abstractmethod
+    def get_completion_window(self) -> Window:
         pass
 
 
@@ -31,7 +39,21 @@ class IDCustDevService(Protocol):
 
 class ICustDevGetter(Protocol):
     @abstractmethod
+    async def get_hello_data(
+            self,
+            dialog_manager: DialogManager,
+    ) -> dict:
+        pass
+
+    @abstractmethod
     async def get_custdev_data(
+            self,
+            dialog_manager: DialogManager,
+    ) -> dict:
+        pass
+
+    @abstractmethod
+    async def get_completion_data(
             self,
             dialog_manager: DialogManager,
     ) -> dict:

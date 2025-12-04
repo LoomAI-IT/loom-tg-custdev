@@ -14,10 +14,6 @@ class CustDevService(interface.ICustDevService):
         return custdev_id
 
     @traced_method()
-    async def get_custdev_by_state_id(self, state_id: int) -> list[model.CustDev]:
-        return await self.custdev_repo.get_custdev_by_state_id(state_id)
-
-    @traced_method()
     async def create_questions(self, questions: list[str]) -> int:
         questions_id = await self.custdev_repo.create_questions(questions)
         return questions_id
@@ -29,11 +25,17 @@ class CustDevService(interface.ICustDevService):
         return ids
 
     @traced_method()
-    async def get_questions_by_id(self, questions_id: int) -> model.CustDevQuestions | None:
+    async def get_all_custdev(self) -> list[model.CustDev]:
+        return await self.custdev_repo.get_all_custdev()
+
+    @traced_method()
+    async def get_custdev_by_id(self, custdev_id: int) -> list[model.CustDev]:
+        return await self.custdev_repo.get_custdev_by_id(custdev_id)
+
+    @traced_method()
+    async def get_questions_by_id(self, questions_id: int) -> list[model.CustDevQuestions]:
         questions = await self.custdev_repo.get_questions_by_id(questions_id)
-        if questions:
-            return questions[0]
-        return None
+        return questions
 
     @traced_method()
     async def get_all_questions(self) -> list[model.CustDevQuestions]:

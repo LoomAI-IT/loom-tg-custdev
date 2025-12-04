@@ -1,8 +1,6 @@
-import traceback
-
 from aiogram.types import Message
+from aiogram.filters import CommandObject
 from aiogram_dialog import DialogManager, StartMode
-from opentelemetry.trace import SpanKind, StatusCode
 
 from internal import model, interface
 from pkg.log_wrapper import auto_log
@@ -14,29 +12,41 @@ class CommandController(interface.ICommandController):
     def __init__(
             self,
             tel: interface.ITelemetry,
-            state_service: interface.IStateService
+            state_service: interface.IStateService,
+            llm_chat_repo: interface.ILLMChatRepo
     ):
         self.logger = tel.logger()
         self.tracer = tel.tracer()
         self.state_service = state_service
+        self.llm_chat_repo = llm_chat_repo
 
     @auto_log()
     @traced_method()
     async def start_handler(
             self,
             message: Message,
-            dialog_manager: DialogManager
+            dialog_manager: DialogManager,
+            command: CommandObject
     ):
-        await dialog_manager.reset_stack()
-
         tg_chat_id = dialog_manager.event.chat.id
+        tg_username = dialog_manager.event.from_user.username
 
         user_state = await self.state_service.state_by_id(tg_chat_id)
         if not user_state:
-            tg_username = message.from_user.username if message.from_user.username else "отсутвует username"
             await self.state_service.create_state(tg_chat_id, tg_username)
+            user_state = await self.state_service.state_by_id(tg_chat_id)
+        user_state = user_state[0]
+
+        start_data = {}
+        if command.args:
+            start_data["questions_id"] = command.args
+
+        chat = await self.llm_chat_repo.get_chat_by_state_id(user_state.id)
+        if chat:
+            await self.llm_chat_repo.delete_chat(chat[0].id)
 
         await dialog_manager.start(
-            model.CustdevStates.custdev,
-            mode=StartMode.RESET_STACK
+            model.CustdevStates.hello,
+            mode=StartMode.RESET_STACK,
+            data=start_data
         )

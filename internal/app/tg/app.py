@@ -1,4 +1,4 @@
-from aiogram.filters import Command
+from aiogram.filters import Command, CommandStart, CommandObject
 from aiogram_dialog import setup_dialogs, BgManagerFactory
 from aiogram import Dispatcher, Router
 
@@ -40,7 +40,7 @@ def include_command_handlers(
 ):
     dp.message.register(
         command_controller.start_handler,
-        Command("start")
+        CommandStart(deep_link=True)
     )
 
 

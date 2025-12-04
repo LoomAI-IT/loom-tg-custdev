@@ -2,6 +2,7 @@ from abc import abstractmethod
 from typing import Protocol, Sequence, Any, Annotated, Callable, Awaitable, Literal
 
 from aiogram.types import TelegramObject, Update, Message
+from aiogram.filters import CommandObject
 from aiogram_dialog import DialogManager
 from fastapi import FastAPI, Header
 from opentelemetry.metrics import Meter
@@ -14,6 +15,7 @@ class ICommandController(Protocol):
             self,
             message: Message,
             dialog_manager: DialogManager,
+            command: CommandObject,
     ): pass
 
 

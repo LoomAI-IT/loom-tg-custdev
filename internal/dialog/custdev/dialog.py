@@ -1,6 +1,7 @@
 from aiogram_dialog import Window, Dialog
 from aiogram_dialog.widgets.input import MessageInput
-from aiogram_dialog.widgets.text import Format, Multi
+from aiogram_dialog.widgets.kbd import Button
+from aiogram_dialog.widgets.text import Format, Multi, Const
 from sulguk import SULGUK_PARSE_MODE
 
 from internal import interface, model
@@ -20,7 +21,21 @@ class CustDevDialog(interface.ICustDevDialog):
 
     def get_dialog(self) -> Dialog:
         return Dialog(
+            self.get_intro_window(),
             self.get_custdev_window(),
+            self.get_completion_window(),
+        )
+
+    def get_intro_window(self) -> Window:
+        return Window(
+            Format("Добро пожаловать! {questions_id}"),
+            Button(
+                Format("Начать опрос"),
+                id="show_confirm_cancel",
+                on_click=lambda c, b, d: d.switch_to(model.CustdevStates.custdev),
+            ),
+            state=model.CustdevStates.hello,
+            getter=self.custdev_getter.get_hello_data,
         )
 
     def get_custdev_window(self) -> Window:
@@ -35,5 +50,16 @@ class CustDevDialog(interface.ICustDevDialog):
 
             state=model.CustdevStates.custdev,
             getter=self.custdev_getter.get_custdev_data,
+            parse_mode=SULGUK_PARSE_MODE,
+        )
+
+    def get_completion_window(self) -> Window:
+        return Window(
+            Multi(
+                Format("{completion_message}"),
+                Const(""),
+            ),
+            state=model.CustdevStates.completion,
+            getter=self.custdev_getter.get_completion_data,
             parse_mode=SULGUK_PARSE_MODE,
         )

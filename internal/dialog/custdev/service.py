@@ -1,11 +1,12 @@
 import traceback
+import json
 
 from aiogram import Bot
 from aiogram.types import Message
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.input import MessageInput
 
-from internal import interface
+from internal import interface, model
 from pkg.html_validator import validate_html
 from pkg.log_wrapper import auto_log
 from pkg.tg_action_wrapper import tg_action
@@ -74,7 +75,6 @@ class DCustDevService(interface.IDCustDevService):
 
             async with tg_action(self.bot, message.chat.id):
                 llm_response_json = await self.llm_chat_manager.process_user_message(
-                    dialog_manager=dialog_manager,
                     message=message,
                     chat_id=chat_id,
                     questions_id=questions_id
@@ -87,9 +87,15 @@ class DCustDevService(interface.IDCustDevService):
                     _ = await self.custdev_service.create_custdev(
                         state_id=state.id,
                         questions_id=questions_id,
-                        result=custdev_result
+                        result=json.dumps(custdev_result, ensure_ascii=False)
                     )
 
+                completion_message = (
+                    "Спасибо за ваш отзыв!\n\n"
+                    "Ваше мнение очень важно для нас и поможет улучшить наш продукт."
+                )
+                dialog_manager.dialog_data["completion_message"] = completion_message
+                await dialog_manager.switch_to(model.CustdevStates.completion)
                 return
 
             message_to_user = llm_response_json["message_to_user"]

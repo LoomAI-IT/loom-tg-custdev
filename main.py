@@ -18,6 +18,7 @@ from internal.controller.tg.middleware.middleware import TgMiddleware
 
 from internal.controller.tg.command.handler import CommandController
 from internal.controller.http.webhook.handler import TelegramWebhookController
+from internal.controller.http.handler.custdev.handler import CustDevController
 
 from internal.dialog.custdev.dialog import CustDevDialog
 
@@ -71,7 +72,7 @@ redis_client = redis.Redis(
     host=cfg.monitoring_redis_host,
     port=cfg.monitoring_redis_port,
     password=cfg.monitoring_redis_password,
-    db=2
+    db=5
 )
 key_builder = DefaultKeyBuilder(with_destiny=True)
 storage = RedisStorage(
@@ -79,7 +80,7 @@ storage = RedisStorage(
     key_builder=key_builder
 )
 dp = Dispatcher(storage=storage)
-bot = Bot(token=cfg.tg_bot_token)
+bot = Bot(token=cfg.tg_custdev_bot_token)
 bot.session.middleware(AiogramSulgukMiddleware())
 
 # Инициализация клиентов
@@ -136,7 +137,7 @@ custdev_dialog = CustDevDialog(
     custdev_getter,
 )
 
-command_controller = CommandController(tel, state_service)
+command_controller = CommandController(tel, state_service, llm_chat_repo)
 
 tg_middleware = TgMiddleware(
     tel,
@@ -170,10 +171,16 @@ tg_webhook_controller = TelegramWebhookController(
     cfg.interserver_secret_key
 )
 
+custdev_controller = CustDevController(
+    tel,
+    custdev_service
+)
+
 app = NewServer(
     db,
     http_middleware,
     tg_webhook_controller,
+    custdev_controller,
     cfg.prefix,
     cfg.environment
 )

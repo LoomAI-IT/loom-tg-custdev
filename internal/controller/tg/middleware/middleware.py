@@ -36,6 +36,7 @@ class TgMiddleware(interface.ITelegramMiddleware):
             data: dict[str, Any]
     ):
         message, event_type, message_text, tg_username, tg_chat_id, message_id = self.__extract_metadata(event)
+        self.logger.info(f"{event=}")
 
         try:
             user_state = await self.state_service.state_by_id(tg_chat_id)
@@ -58,9 +59,7 @@ class TgMiddleware(interface.ITelegramMiddleware):
 
         except Exception as e:
             self.logger.warning("Ошибка!!!", {"traceback": traceback.format_exc()})
-            if not await self._recovery_start_functionality(tg_chat_id, tg_username):
-                self.logger.error("Ошибка!!!", {"traceback": traceback.format_exc()})
-                raise e
+            self.logger.error("Ошибка!!!", {"traceback": traceback.format_exc()})
 
         finally:
             self.log_context.reset(context_token)
@@ -84,7 +83,7 @@ class TgMiddleware(interface.ITelegramMiddleware):
 
         # Запускаем соответствующий диалог
         await dialog_manager.start(
-            model.CustdevStates.custdev,
+            model.CustdevStates.hello,
             mode=StartMode.RESET_STACK
         )
 

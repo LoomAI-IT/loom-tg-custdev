@@ -1,19 +1,10 @@
 import io
-import re
-import json
 from typing import Literal
 
 import httpx
-import pypdf
-import base64
 import openai
-from openai.types import ImagesResponse
 
 from openai.types.audio import Transcription, TranscriptionVerbose
-from pdf2image import convert_from_bytes
-from openai.types.chat.chat_completion import ChatCompletion
-
-from opentelemetry.trace import Status, StatusCode, SpanKind
 
 from internal import interface
 from pkg.trace_wrapper import traced_method

@@ -34,13 +34,11 @@ class LLMChatManager:
 
     async def process_user_message(
             self,
-            dialog_manager: DialogManager,
             message: Message,
             chat_id: int,
             questions_id: int,
     ) -> dict:
         user_text = await self.message_extractor.process_voice_or_text_input(
-            dialog_manager=dialog_manager,
             message=message,
         )
 
@@ -90,7 +88,7 @@ class LLMChatManager:
                 "content": msg.text
             })
 
-        questions = await self.custdev_service.get_questions_by_id(questions_id)
+        questions = (await self.custdev_service.get_questions_by_id(questions_id))[0]
         system_prompt = await self.custdev_prompt_generator.get_custdev_system_prompt(questions)
         llm_response_json, generate_cost = await self.anthropic_client.generate_json(
             history=history,

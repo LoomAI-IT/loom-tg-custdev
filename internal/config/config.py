@@ -11,7 +11,7 @@ class Config:
         self.root_path = os.getenv("ROOT_PATH", "/")
         self.prefix = os.getenv("LOOM_TG_CUSTDEV_PREFIX", "/api/tg-bot")
         self.log_level = os.getenv("LOG_LEVEL", "INFO")
-        self.tg_custdev_bot_token: str = os.environ.get('LOOM_TG_CUSTDEV_TOKEN')
+        self.tg_custdev_bot_token: str = os.environ.get('LOOM_TG_CUSTDEV_BOT_TOKEN')
         self.domain: str = os.environ.get("LOOM_DOMAIN")
         self.proxy: str = os.environ.get("PROXY")
 
@@ -25,7 +25,7 @@ class Config:
         self.db_pass = os.getenv("LOOM_TG_CUSTDEV_POSTGRES_PASSWORD", "password")
 
         # Настройки телеметрии
-        self.alert_tg_bot_token = os.getenv("LOOM_ALERT_TG_CUSTDEV_TOKEN", "")
+        self.alert_tg_bot_token = os.getenv("LOOM_ALERT_TG_BOT_TOKEN", "")
         self.alert_tg_chat_id = int(os.getenv("LOOM_ALERT_TG_CHAT_ID", "0"))
         self.alert_tg_chat_thread_id = int(os.getenv("LOOM_ALERT_TG_CHAT_THREAD_ID", "0"))
         self.grafana_url = os.getenv("LOOM_GRAFANA_URL", "")

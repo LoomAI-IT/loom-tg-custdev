@@ -20,7 +20,6 @@ class MessageExtractor:
     async def process_voice_or_text_input(
             self,
             message: Message,
-            dialog_manager: DialogManager,
             return_html: bool = False,
     ) -> str:
         if message.content_type == ContentType.TEXT:
@@ -28,23 +27,16 @@ class MessageExtractor:
         else:
             return await self.speech_to_text(
                 message=message,
-                dialog_manager=dialog_manager,
             )
 
     async def speech_to_text(
             self,
             message: Message,
-            dialog_manager: DialogManager,
-            show_is_transcribe: bool = True,
     ) -> str:
         if message.voice:
             file_id = message.voice.file_id
         else:
             file_id = message.audio.file_id
-
-        dialog_manager.dialog_data["voice_transcribe"] = True
-        if show_is_transcribe:
-            await dialog_manager.show()
 
         file = await self.bot.get_file(file_id)
         file_data = await self.bot.download_file(file.file_path)
@@ -56,5 +48,4 @@ class MessageExtractor:
             language="ru",
         )
 
-        dialog_manager.dialog_data["voice_transcribe"] = False
         return text
